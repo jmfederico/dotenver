@@ -9,6 +9,7 @@ DIRECTORY = tempfile.TemporaryDirectory()
 TEMPLATE_FILE = tempfile.NamedTemporaryFile(dir=DIRECTORY.name, delete=False)
 TEMPLATE_FILE.write(
     b"""
+STATIC_VARIABLE=static
 export FALSE_VARIABLE= ## ## dotenver:boolean(chance_of_getting_true=0)
 TRUE_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=100)
 """
@@ -33,6 +34,7 @@ def test_parse():
     DOTENV_FILE.truncate(0)
     dotenver.parse_files([TEMPLATE_FILE.name])
     expected = """
+STATIC_VARIABLE=static
 export FALSE_VARIABLE=False
 TRUE_VARIABLE=True
 """
@@ -54,6 +56,7 @@ EXISTING_VARIABLE=existing
     dotenver.parse_files([TEMPLATE_FILE.name], override=False)
 
     expected = """
+STATIC_VARIABLE=static
 export FALSE_VARIABLE=False
 TRUE_VARIABLE=True
 
@@ -72,6 +75,7 @@ def test_existing_are_respected():
     DOTENV_FILE.truncate(0)
     DOTENV_FILE.write(
         """
+STATIC_VARIABLE=dynamic
 export FALSE_VARIABLE=True
 TRUE_VARIABLE=False
 """
@@ -81,6 +85,7 @@ TRUE_VARIABLE=False
     dotenver.parse_files([TEMPLATE_FILE.name])
 
     expected = """
+STATIC_VARIABLE=dynamic
 export FALSE_VARIABLE=True
 TRUE_VARIABLE=False
 """
@@ -94,6 +99,7 @@ def test_existing_are_overridden():
     DOTENV_FILE.write(
         """
 # A comment
+STATIC_VARIABLE=dynamic
 export FALSE_VARIABLE=True
 TRUE_VARIABLE=False
 """
@@ -103,6 +109,7 @@ TRUE_VARIABLE=False
     dotenver.parse_files([TEMPLATE_FILE.name], override=True)
 
     expected = """
+STATIC_VARIABLE=static
 export FALSE_VARIABLE=False
 TRUE_VARIABLE=True
 """
@@ -124,6 +131,7 @@ EXISTING_VARIABLE=existing
     dotenver.parse_files([TEMPLATE_FILE.name], override=True)
 
     expected = """
+STATIC_VARIABLE=static
 export FALSE_VARIABLE=False
 TRUE_VARIABLE=True
 """
@@ -147,6 +155,27 @@ NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)
 
     expected = """
 NAMED_VARIABLE=True
+"""
+    DOTENV_FILE.seek(0)
+    assert DOTENV_FILE.read() == expected
+
+
+def test_dotenver_triumphs_value():
+    """Test that dotenver is prefferred over value in template."""
+    DOTENV_FILE.truncate(0)
+
+    tamplate_with_name = tempfile.NamedTemporaryFile(dir=DIRECTORY.name)
+    tamplate_with_name.write(
+        b"""
+VARIABLE=value ## dotenver:boolean(chance_of_getting_true=100)
+"""
+    )
+    tamplate_with_name.flush()
+
+    dotenver.parse_files([tamplate_with_name.name])
+
+    expected = """
+VARIABLE=True
 """
     DOTENV_FILE.seek(0)
     assert DOTENV_FILE.read() == expected

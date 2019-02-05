@@ -19,12 +19,12 @@ VARIABLE_REGEX = r"""
         ([^\s=]+)                       # Variable name
     )
     \s*=\s*                             # Equal sign
+    (.*?)                               # Verbatim value, no parsing done
 """
 
 VALUES_REGEX = re.compile(
     r"""
         {0}
-        (.*)                            # Verbatim value, no parsing done
         $
     """.format(
         VARIABLE_REGEX
@@ -35,14 +35,13 @@ VALUES_REGEX = re.compile(
 TEMPLATE_REGEX = re.compile(
     r"""
         {0}
-        .*                              # Anything until a dotenver comment
         (?:
             \#\#\ +dotenver:            # Start of the dotenver comment
             ([^\(\s]+)                  # Faker generator to use
             (?:\((
                 .*                      # Arguments to pass to the generator
             )\))?
-        )
+        )?                              # dotenver comment is optional
         \s*$
     """.format(
         VARIABLE_REGEX
@@ -95,16 +94,18 @@ def parse_stream(template_stream, current_dotenv):
     for line in template_stream:
         match = TEMPLATE_REGEX.match(line)
         if match:
-            assignment, variable, faker, arguments = match.groups()
+            assignment, variable, value, faker, arguments = match.groups()
 
             if variable in current_dotenv:
                 del missing_variables[variable]
                 line = f"{assignment}={current_dotenv[variable][1]}"
-            else:
+            elif faker:
                 dotenver_args = f"'{faker}'"
                 if arguments:
                     dotenver_args = f"{dotenver_args}, {arguments}"
                 line = f"{assignment}={{{{ dotenver({dotenver_args}) }}}}"
+            else:
+                line = f"{assignment}={value}"
 
         jinja2_template.write(f"{line.strip()}\n")
 
@@ -117,8 +118,8 @@ def parse_stream(template_stream, current_dotenv):
 
 """
         )
-        for data in missing_variables.values():
-            jinja2_template.write(f"{data[0]}={data[1]}\n")
+        for assignment, value in missing_variables.values():
+            jinja2_template.write(f"{assignment}={value}\n")
 
     template = env.from_string(jinja2_template.getvalue())
 
