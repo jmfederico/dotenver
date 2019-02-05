@@ -1,0 +1,68 @@
+============================
+Python DotEnver
+============================
+
+.. image:: https://badge.fury.io/py/dotenver.svg
+    :target: https://badge.fury.io/py/dotenver
+
+.. image:: https://travis-ci.org/jmfederico/dotenver.svg?branch=master
+    :target: https://travis-ci.org/jmfederico/dotenver
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
+A Python app to generate dotenv (.env) files from templates.
+
+
+Features
+--------
+
+* Automatic .env file generation from .env.example files
+* Useful for CI or Docker deployments
+* Uses Jinja2_ as rendering engine
+* Uses Faker_ for value generation
+
+
+Quickstart
+----------
+
+1. Install **Python DotEnver**::
+
+    $ pip install dotenver
+
+2. Create a **.env.example** following this example::
+
+    # Full line comments will be kept
+
+    # Simple usage
+    NAME= ## dotenver:first_name
+
+    # Pass parameters to fakers
+    ENABLED= ## dotenver:boolean(chance_of_getting_true=50)
+
+    # Name your values
+    MYSQL_PASSWORD= ## dotenver:password(name=database_password, length=20)
+    # And get the same value again, when the name is repeated.
+    DB_PASSWORD= ## dotenver:password(name=database_password)
+
+    # Output your values within double or single quotes
+    DOUBLE_QUOTED_NAME= ## dotenver:name(quotes='"')
+    SINGLE_QUOTED_NAME= ## dotenver:name(quotes="'")
+
+    # Literal values are possible
+    export EXPORTED_VARIABLE=exported
+
+3. Run python **DotEnver** form the CLI::
+
+    $ dotenver -r
+
+4. You now have a new **.env** file ready to use.
+
+5. For more usage options run::
+
+    $ dotenver -h
+
+
+.. _Faker: https://faker.readthedocs.io
+.. _Jinja2: http://jinja.pocoo.org
+.. _jmfederico: https://github.com/jmfederico

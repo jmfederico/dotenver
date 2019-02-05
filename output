@@ -1,0 +1,9 @@
+usage: dotenver [-h] file [file ...]
+
+Process files with dotenver.
+
+positional arguments:
+  file        path to file to process
+
+optional arguments:
+  -h, --help  show this help message and exit
