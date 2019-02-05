@@ -4,7 +4,9 @@ import tempfile
 
 from dotenver import __version__, dotenver
 
-TEMPLATE_FILE = tempfile.NamedTemporaryFile()
+DIRECTORY = tempfile.TemporaryDirectory()
+
+TEMPLATE_FILE = tempfile.NamedTemporaryFile(dir=DIRECTORY.name, delete=False)
 TEMPLATE_FILE.write(
     b"""
 export FALSE_VARIABLE= ## ## dotenver:boolean(chance_of_getting_true=0)
@@ -13,7 +15,7 @@ TRUE_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=100)
 )
 TEMPLATE_FILE.flush()
 
-NAMED_TEMPLATE_FILE = tempfile.NamedTemporaryFile()
+NAMED_TEMPLATE_FILE = tempfile.NamedTemporaryFile(dir=DIRECTORY.name, delete=False)
 NAMED_TEMPLATE_FILE.write(
     b"""
 NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)
@@ -21,7 +23,7 @@ NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)
 )
 NAMED_TEMPLATE_FILE.flush()
 
-DOTENV_FILE = open(dotenver.get_dotenv_path(TEMPLATE_FILE.name), "r+")
+DOTENV_FILE = open(dotenver.get_dotenv_path(TEMPLATE_FILE.name), "w+")
 
 
 def test_version():
