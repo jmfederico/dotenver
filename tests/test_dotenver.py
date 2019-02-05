@@ -15,14 +15,6 @@ TRUE_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=100)
 )
 TEMPLATE_FILE.flush()
 
-NAMED_TEMPLATE_FILE = tempfile.NamedTemporaryFile(dir=DIRECTORY.name, delete=False)
-NAMED_TEMPLATE_FILE.write(
-    b"""
-NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)
-"""
-)
-NAMED_TEMPLATE_FILE.flush()
-
 DOTENV_FILE = open(dotenver.get_dotenv_path(TEMPLATE_FILE.name), "w+")
 
 
@@ -143,7 +135,15 @@ def test_named_values_are_equal():
     """Test that named variables have the same value."""
     DOTENV_FILE.truncate(0)
 
-    dotenver.parse_files([TEMPLATE_FILE.name, NAMED_TEMPLATE_FILE.name], override=True)
+    tamplate_with_name = tempfile.NamedTemporaryFile(dir=DIRECTORY.name)
+    tamplate_with_name.write(
+        b"""
+NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)
+"""
+    )
+    tamplate_with_name.flush()
+
+    dotenver.parse_files([TEMPLATE_FILE.name, tamplate_with_name.name], override=True)
 
     expected = """
 NAMED_VARIABLE=True
