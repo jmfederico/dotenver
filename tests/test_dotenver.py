@@ -21,7 +21,7 @@ DOTENV_FILE = open(dotenver.get_dotenv_path(TEMPLATE_FILE.name), "w+")
 
 def test_version():
     """Test that version has correctly set."""
-    assert __version__ == "0.3.0.dev0"
+    assert __version__ == "0.3.0"
 
 
 def test_dotenv_path():
