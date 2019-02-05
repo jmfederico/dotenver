@@ -9,7 +9,6 @@ license = "BSD-3-Clause"
 python = "^3.6"
 jinja2 = "^2.10"
 faker = "^1.0"
-python-dotenv = {version = "^0.10.1",extras = ["cli"]}
 colorama = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
