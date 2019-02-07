@@ -26,11 +26,15 @@ Features
 Quickstart
 ----------
 
-1. Install **Python DotEnver**::
+1. Install **Python DotEnver**
+
+   .. code-block:: console
 
     $ pip install dotenver
 
-2. Create a **.env.example** following this example::
+2. Create a **.env.example** following this example
+
+   .. code-block:: ini
 
     # Full line comments will be kept
 
@@ -52,17 +56,32 @@ Quickstart
     # Literal values are possible
     export EXPORTED_VARIABLE=exported
 
-3. Run python **DotEnver** form the CLI::
+3. Run python **DotEnver** form the CLI
+
+   .. code-block:: console
 
     $ dotenver -r
 
 4. You now have a new **.env** file ready to use.
 
-5. For more usage options run::
+5. For more usage options run
+
+   .. code-block:: console
 
     $ dotenver -h
 
 
+Docker
+------
+
+A Docker image `is provided <Dotenver image_>`_. To use it, mount your source code to
+`/var/lib/dotenver/` and run the container.
+
+.. code-block:: console
+
+    $ docker run --rm -v `pwd`:/var/lib/dotenver/ jmfederico/dotenver
+
 .. _Faker: https://faker.readthedocs.io
 .. _Jinja2: http://jinja.pocoo.org
 .. _jmfederico: https://github.com/jmfederico
+.. _`Dotenver image`: https://cloud.docker.com/repository/docker/jmfederico/dotenver
