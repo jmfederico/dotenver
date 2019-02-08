@@ -187,7 +187,7 @@ version = "16.3.0"
 setuptools = ">=18.0.0"
 
 [metadata]
-content-hash = "4f9cee997db87c337ddc0278c13a04d4a92fe0c37dbca414a2eef953609665bc"
+content-hash = "2a0e9b9f73698be89a487ed1b1f9d6aea468c30f150372725ab9fe7351320c96"
 python-versions = "^3.6"
 
 [metadata.hashes]

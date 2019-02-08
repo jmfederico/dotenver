@@ -28,6 +28,7 @@ pytest = "^3.0"
 docutils = "^0.14.0"
 pygments = "^2.3"
 tox = "^3.7"
+toml = "^0.10.0"
 
 [tool.poetry.scripts]
 dotenver = 'dotenver.cli:cli'

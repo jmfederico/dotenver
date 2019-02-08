@@ -2,6 +2,8 @@
 
 import tempfile
 
+import toml
+
 from dotenver import __version__, dotenver
 
 DIRECTORY = tempfile.TemporaryDirectory()
@@ -38,8 +40,9 @@ def get_tempfile(content):
 
 
 def test_version():
-    """Test that version has correctly set."""
-    assert __version__ == "0.5.0.dev0"
+    """Test that version is correctly set."""
+    project = toml.load('pyproject.toml')
+    assert project['tool']['poetry']['version'] == __version__
 
 
 def test_dotenv_path():
