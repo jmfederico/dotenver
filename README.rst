@@ -54,6 +54,9 @@ Quickstart
     SINGLE_QUOTED= ## dotenver:last_name(quotes="'")
 
     # Literal values are possible
+    STATIC_VARIABLE=static value
+
+    # export syntax can be used
     export EXPORTED_VARIABLE=exported
 
 3. Run python **DotEnver** form the CLI
