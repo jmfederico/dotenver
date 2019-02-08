@@ -89,7 +89,7 @@ def parse_stream(template_stream, current_dotenv):
     env = Environment(keep_trailing_newline=True)
     env.globals["dotenver"] = dotenver
 
-    missing_variables = current_dotenv.copy()
+    extra_variables = current_dotenv.copy()
 
     for line in template_stream:
         match = TEMPLATE_REGEX.match(line)
@@ -97,7 +97,10 @@ def parse_stream(template_stream, current_dotenv):
             assignment, variable, value, faker, arguments = match.groups()
 
             if variable in current_dotenv:
-                del missing_variables[variable]
+                try:
+                    del extra_variables[variable]
+                except KeyError:
+                    pass
                 line = f"{assignment}={current_dotenv[variable][1]}"
             elif faker:
                 dotenver_args = f"'{faker}'"
@@ -109,7 +112,7 @@ def parse_stream(template_stream, current_dotenv):
 
         jinja2_template.write(f"{line.strip()}\n")
 
-    if missing_variables:
+    if extra_variables:
         jinja2_template.write(
             """
 ######################################
@@ -118,7 +121,7 @@ def parse_stream(template_stream, current_dotenv):
 
 """
         )
-        for assignment, value in missing_variables.values():
+        for assignment, value in extra_variables.values():
             jinja2_template.write(f"{assignment}={value}\n")
 
     template = env.from_string(jinja2_template.getvalue())

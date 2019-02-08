@@ -179,3 +179,32 @@ VARIABLE=True
 """
     DOTENV_FILE.seek(0)
     assert DOTENV_FILE.read() == expected
+
+
+def test_can_handle_duplicate_existing_variable():
+    """Test that dotenver does not break on duplicate existing variables."""
+    DOTENV_FILE.truncate(0)
+    DOTENV_FILE.write(
+        """
+DUPLICATE_VARIABLE=duplicate
+"""
+    )
+    DOTENV_FILE.flush()
+
+    tamplate_with_duplicate = tempfile.NamedTemporaryFile(dir=DIRECTORY.name)
+    tamplate_with_duplicate.write(
+        b"""
+DUPLICATE_VARIABLE= ## dotenver:boolean(chance_of_getting_true=100)
+DUPLICATE_VARIABLE= ## dotenver:boolean(chance_of_getting_true=0)
+"""
+    )
+    tamplate_with_duplicate.flush()
+
+    dotenver.parse_files([tamplate_with_duplicate.name])
+
+    expected = """
+DUPLICATE_VARIABLE=duplicate
+DUPLICATE_VARIABLE=duplicate
+"""
+    DOTENV_FILE.seek(0)
+    assert DOTENV_FILE.read() == expected
