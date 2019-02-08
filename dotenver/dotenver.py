@@ -16,25 +16,21 @@ VARIABLE_REGEX = r"""
     (
         (?:export\s)?                   # Optional export command
         \s*
-        ([^\s=]+)                       # Variable name
+        ([^\s=#]+)                      # Variable name
     )
-    \s*=\s*                             # Equal sign
-    (.*?)                               # Verbatim value, no parsing done
+    (?:
+        \s*=\s*?                        # Assignment
+        (.*?)                           # Verbatim value, no parsing done
+        {0}                             # Capture placeholder
+    )?
+    \s*$
 """
 
-VALUES_REGEX = re.compile(
-    r"""
-        {0}
-        $
-    """.format(
-        VARIABLE_REGEX
-    ),
-    re.VERBOSE,
-)
+VALUES_REGEX = re.compile(VARIABLE_REGEX.format(""), re.VERBOSE)
 
 TEMPLATE_REGEX = re.compile(
-    r"""
-        {0}
+    VARIABLE_REGEX.format(
+        r"""
         (?:
             \#\#\ +dotenver:            # Start of the dotenver comment
             ([^\(\s]+)                  # Faker generator to use
@@ -42,9 +38,7 @@ TEMPLATE_REGEX = re.compile(
                 .*                      # Arguments to pass to the generator
             )\))?
         )?                              # dotenver comment is optional
-        \s*$
-    """.format(
-        VARIABLE_REGEX
+    """
     ),
     re.VERBOSE,
 )
@@ -94,21 +88,23 @@ def parse_stream(template_stream, current_dotenv):
     for line in template_stream:
         match = TEMPLATE_REGEX.match(line)
         if match:
-            assignment, variable, value, faker, arguments = match.groups()
+            left_side, variable, value, faker, arguments = match.groups()
 
             if variable in current_dotenv:
                 try:
                     del extra_variables[variable]
                 except KeyError:
                     pass
-                line = f"{assignment}={current_dotenv[variable][1]}"
+                line = f"{left_side}={current_dotenv[variable][1]}"
             elif faker:
                 dotenver_args = f"'{faker}'"
                 if arguments:
                     dotenver_args = f"{dotenver_args}, {arguments}"
-                line = f"{assignment}={{{{ dotenver({dotenver_args}) }}}}"
+                line = f"{left_side}={{{{ dotenver({dotenver_args}) }}}}"
+            elif value:
+                line = f"{left_side}={value}"
             else:
-                line = f"{assignment}={value}"
+                line = left_side
 
         jinja2_template.write(f"{line.strip()}\n")
 
@@ -121,8 +117,8 @@ def parse_stream(template_stream, current_dotenv):
 
 """
         )
-        for assignment, value in extra_variables.values():
-            jinja2_template.write(f"{assignment}={value}\n")
+        for left_side, value in extra_variables.values():
+            jinja2_template.write(f"{left_side}={value}\n")
 
     template = env.from_string(jinja2_template.getvalue())
 
