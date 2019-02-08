@@ -120,7 +120,11 @@ def parse_stream(template_stream, current_dotenv):
                     except KeyError:
                         VARIABLES[key] = current_value
 
-                line = f"{left_side}={current_value}"
+                line = (
+                    f"{left_side}={current_value}"
+                    if current_value is not None
+                    else left_side
+                )
             elif generator:
                 dotenver_args = f"'{generator}'"
                 if name:

@@ -41,8 +41,8 @@ def get_tempfile(content):
 
 def test_version():
     """Test that version is correctly set."""
-    project = toml.load('pyproject.toml')
-    assert project['tool']['poetry']['version'] == __version__
+    project = toml.load("pyproject.toml")
+    assert project["tool"]["poetry"]["version"] == __version__
 
 
 def test_dotenv_path():
@@ -223,11 +223,25 @@ def test_existing_unassigned_variables_are_respected():
     """Test that existing values for unassigned variables are respected."""
     set_dotenv("UNASSIGNED_EXTSTING=assigned")
 
-    tamplate_with_unassigned = get_tempfile("UNASSIGNED_EXTSTING")
+    tamplate = get_tempfile("UNASSIGNED_EXTSTING")
 
-    dotenver.parse_files([tamplate_with_unassigned.name])
+    dotenver.parse_files([tamplate.name])
 
     expected = "UNASSIGNED_EXTSTING=assigned\n"
+    assert DOTENV_FILE.read() == expected
+
+
+def test_declared_unassigned_variables_are_respected():
+    """Test that declared that are set as unassigned are left untouched."""
+    set_dotenv("TRUE_VARIABLE")
+
+    dotenver.parse_files([TEMPLATE_FILE.name])
+
+    expected = """
+STATIC_VARIABLE=static
+export FALSE_VARIABLE=False
+TRUE_VARIABLE
+"""
     assert DOTENV_FILE.read() == expected
 
 
@@ -240,4 +254,18 @@ def test_unassigned_variables():
     dotenver.parse_files([tamplate_with_unassigned.name])
 
     expected = "UNASSIGNED\n"
+    assert DOTENV_FILE.read() == expected
+
+
+def test_empty_values_are_values():
+    """Test that variables set to empty are respected."""
+    set_dotenv("TRUE_VARIABLE=")
+
+    dotenver.parse_files([TEMPLATE_FILE.name])
+
+    expected = """
+STATIC_VARIABLE=static
+export FALSE_VARIABLE=False
+TRUE_VARIABLE=
+"""
     assert DOTENV_FILE.read() == expected
