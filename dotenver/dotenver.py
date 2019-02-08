@@ -33,7 +33,12 @@ TEMPLATE_REGEX = re.compile(
         r"""
         (?:
             \#\#\ +dotenver:            # Start of the dotenver comment
-            ([^\(\s]+)                  # Faker generator to use
+            (?:
+                ([^\(\s#:]+)             # Faker generator to use
+                (?::
+                    ([^\(\s#]+)         # Value name
+                )?
+            )
             (?:\((
                 .*                      # Arguments to pass to the generator
             )\))?
@@ -43,6 +48,18 @@ TEMPLATE_REGEX = re.compile(
     re.VERBOSE,
 )
 FAKE = Faker()
+
+
+def get_value_key(generator, name):
+    """
+    Return a key for the given generator and name pair.
+
+    If name None, no key is generated.
+    """
+    if name is not None:
+        return f"{generator}+{name}"
+
+    return None
 
 
 def dotenver(generator, name=None, quotes=None, escape_with="\\", **kwargs):
@@ -60,20 +77,18 @@ def dotenver(generator, name=None, quotes=None, escape_with="\\", **kwargs):
     if quotes not in [None, "'", '"']:
         raise ValueError("quotes must be a single `'` or double `\"` quote")
 
-    key = None
-    if name is not None:
-        key = f"{generator}+{name}"
+    key = get_value_key(generator, name)
 
-    data = str(VARIABLES.get(key, getattr(FAKE, generator)(**kwargs)))
+    value = str(VARIABLES.get(key, getattr(FAKE, generator)(**kwargs)))
 
     if key and key not in VARIABLES:
-        VARIABLES[key] = data
+        VARIABLES[key] = value
 
     if quotes:
-        data = data.replace(quotes, f"{escape_with}{quotes}")
-        data = f"{quotes}{data}{quotes}"
+        value = value.replace(quotes, f"{escape_with}{quotes}")
+        value = f"{quotes}{value}{quotes}"
 
-    return data
+    return value
 
 
 def parse_stream(template_stream, current_dotenv):
@@ -88,16 +103,28 @@ def parse_stream(template_stream, current_dotenv):
     for line in template_stream:
         match = TEMPLATE_REGEX.match(line)
         if match:
-            left_side, variable, value, faker, arguments = match.groups()
+            left_side, variable, value, generator, name, arguments = match.groups()
 
             if variable in current_dotenv:
+                current_value = current_dotenv[variable][1]
                 try:
                     del extra_variables[variable]
                 except KeyError:
                     pass
-                line = f"{left_side}={current_dotenv[variable][1]}"
-            elif faker:
-                dotenver_args = f"'{faker}'"
+
+                # Keep track of existing named values.
+                key = get_value_key(generator, name)
+                if key:
+                    try:
+                        VARIABLES[key]
+                    except KeyError:
+                        VARIABLES[key] = current_value
+
+                line = f"{left_side}={current_value}"
+            elif generator:
+                dotenver_args = f"'{generator}'"
+                if name:
+                    dotenver_args = f"{dotenver_args}, '{name}'"
                 if arguments:
                     dotenver_args = f"{dotenver_args}, {arguments}"
                 line = f"{left_side}={{{{ dotenver({dotenver_args}) }}}}"
@@ -122,7 +149,7 @@ def parse_stream(template_stream, current_dotenv):
 
     template = env.from_string(jinja2_template.getvalue())
 
-    return template.render()
+    return template
 
 
 def get_dotenv_path(template_path):
@@ -167,17 +194,37 @@ def get_dotenv_dict(dotenv_path):
 def parse_files(templates_paths, override=False):
     """Parse multiple dotenver templates and generate or update a .env for each."""
     colorama.init()
+    jinja2_templates = {}
     rendered_templates = {}
 
+    # First pass will:
+    # - capture all variables form templates and .env files
+    # - capture existing values from .env files
+    # - generate Jinja2 template
     for template_path in templates_paths:
         current_env = (
             get_dotenv_dict(get_dotenv_path(template_path)) if not override else {}
         )
         try:
             with open(template_path, "r") as template_file:
-                rendered_templates[template_path] = parse_stream(
+                jinja2_templates[template_path] = parse_stream(
                     template_file, current_env
                 )
+        except Exception:
+            print(
+                f"{colorama.Fore.RED}\n",
+                f"The following exception ocurred while processing template '{template_path}'",
+                f"\n{colorama.Fore.YELLOW}",
+                file=sys.stderr,
+            )
+            raise
+
+    # Second pass renders the templates.
+    # Rendering on a second pass ensures all named values from .env files
+    # were captured, and can be assigned to named dotenvers in templates.
+    for template_path, jinja2_template in jinja2_templates.items():
+        try:
+            rendered_templates[template_path] = jinja2_template.render()
         except Exception:
             print(
                 f"{colorama.Fore.RED}\n",

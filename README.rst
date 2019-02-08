@@ -45,13 +45,13 @@ Quickstart
     ENABLED= ## dotenver:boolean(chance_of_getting_true=50)
 
     # Name your values
-    MYSQL_PASSWORD= ## dotenver:password(name='database_password', length=20)
+    MYSQL_PASSWORD= ## dotenver:password:my_password(length=20)
     # And get the same value again, when the name is repeated.
-    DB_PASSWORD= ## dotenver:password(name='database_password')
+    DB_PASSWORD= ## dotenver:password:my_password()
 
     # Output your values within double or single quotes
-    DOUBLE_QUOTED_NAME= ## dotenver:name(quotes='"')
-    SINGLE_QUOTED_NAME= ## dotenver:name(quotes="'")
+    DOUBLE_QUOTED= ## dotenver:last_name(quotes='"')
+    SINGLE_QUOTED= ## dotenver:last_name(quotes="'")
 
     # Literal values are possible
     export EXPORTED_VARIABLE=exported

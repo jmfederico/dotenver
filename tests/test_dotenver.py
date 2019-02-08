@@ -13,7 +13,7 @@ TEMPLATE_FILE.write(
     """
 STATIC_VARIABLE=static
 export FALSE_VARIABLE= ## ## dotenver:boolean(chance_of_getting_true=0)
-TRUE_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=100)
+TRUE_VARIABLE= ## dotenver:boolean:named(chance_of_getting_true=100)
 """
 )
 TEMPLATE_FILE.flush()
@@ -152,12 +152,32 @@ def test_named_values_are_equal():
     set_dotenv("")
 
     tamplate_with_name = get_tempfile(
-        "NAMED_VARIABLE= ## dotenver:boolean(name='true', chance_of_getting_true=0)"
+        "NAMED_VARIABLE= ## dotenver:boolean:named(chance_of_getting_true=0)"
     )
 
     dotenver.parse_files([TEMPLATE_FILE.name, tamplate_with_name.name], override=True)
 
     expected = "NAMED_VARIABLE=True\n"
+    assert DOTENV_FILE.read() == expected
+
+
+def test_existing_named_values_are_used():
+    """Test that existing named variables get captured and reused."""
+    set_dotenv("EXISTING_NAMED=value")
+
+    tamplate_with_name = get_tempfile(
+        """
+NON_EXISTING_NAMED= ## dotenver:boolean:existing(chance_of_getting_true=0)
+EXISTING_NAMED= ## dotenver:boolean:existing(chance_of_getting_true=100)
+"""
+    )
+
+    dotenver.parse_files([tamplate_with_name.name])
+
+    expected = """
+NON_EXISTING_NAMED=value
+EXISTING_NAMED=value
+"""
     assert DOTENV_FILE.read() == expected
 
 
