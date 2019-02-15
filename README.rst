@@ -87,4 +87,4 @@ A Docker image `is provided <Dotenver image_>`_. To use it, mount your source co
 .. _Faker: https://faker.readthedocs.io
 .. _Jinja2: http://jinja.pocoo.org
 .. _jmfederico: https://github.com/jmfederico
-.. _`Dotenver image`: https://cloud.docker.com/repository/docker/jmfederico/dotenver
+.. _`Dotenver image`: https://hub.docker.com/r/jmfederico/dotenver
