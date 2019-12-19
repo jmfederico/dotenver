@@ -149,7 +149,10 @@ def parse_stream(template_stream, current_dotenv):
 """
         )
         for left_side, value in extra_variables.values():
-            jinja2_template.write(f"{left_side}={value}\n")
+            template_string = (
+                f"{left_side}={value}" if value is not None else left_side
+            )
+            jinja2_template.write(f"{template_string}\n")
 
     template = env.from_string(jinja2_template.getvalue())
 

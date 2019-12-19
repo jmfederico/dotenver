@@ -68,7 +68,7 @@ def test_unknowns_are_kept():
     """Test that existing unknown variables are kept."""
     set_dotenv(
         """
-EXISTING_VARIABLE=existing
+UNKNOWN_VARIABLE=existing
 """
     )
 
@@ -83,7 +83,55 @@ TRUE_VARIABLE=True
 # Variables not in Dotenver template #
 ######################################
 
-EXISTING_VARIABLE=existing
+UNKNOWN_VARIABLE=existing
+"""
+    assert DOTENV_FILE.read() == expected
+
+
+def test_empty_unknowns_are_kept():
+    """Test that existing empty unknown variables are kept empty."""
+    set_dotenv(
+        """
+UNKNOWN_VARIABLE=
+"""
+    )
+
+    dotenver.parse_files([TEMPLATE_FILE.name], override=False)
+
+    expected = """
+STATIC_VARIABLE=static
+export FALSE_VARIABLE=False
+TRUE_VARIABLE=True
+
+######################################
+# Variables not in Dotenver template #
+######################################
+
+UNKNOWN_VARIABLE=
+"""
+    assert DOTENV_FILE.read() == expected
+
+
+def test_unasigned_unknowns_are_kept():
+    """Test that existing unasigned unknown variables are kept empty."""
+    set_dotenv(
+        """
+UNKNOWN_VARIABLE
+"""
+    )
+
+    dotenver.parse_files([TEMPLATE_FILE.name], override=False)
+
+    expected = """
+STATIC_VARIABLE=static
+export FALSE_VARIABLE=False
+TRUE_VARIABLE=True
+
+######################################
+# Variables not in Dotenver template #
+######################################
+
+UNKNOWN_VARIABLE
 """
     assert DOTENV_FILE.read() == expected
 
