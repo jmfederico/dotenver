@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dotenver"
-version = "0.8.0.dev0"
+version = "0.8.0"
 description = "Automatically generate .env files from .env.example template files"
 authors = ["Federico Jaramillo Martínez <federicojaramillom@gmail.com>"]
 license = "BSD-3-Clause"
