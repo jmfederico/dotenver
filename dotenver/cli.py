@@ -90,8 +90,37 @@ By default values in existing in .env files are respected, and missing variables
         files = glob.glob("**/.env.example", recursive=True)
 
         if not files:
-            print(colorama.Fore.RED, file=sys.stderr)
-            print('No ".env.example" files found', file=sys.stderr)
+
+            print(
+                colorama.Fore.RED,
+                'No ".env.example" files found',
+                file=sys.stderr,
+                sep="",
+            )
+            return
+
+        print(
+            colorama.Fore.BLUE,
+            "The following files will be parsed:",
+            file=sys.stderr,
+            sep="",
+        )
+
+        for file_ in files:
+            print(colorama.Fore.BLUE, f" - {file_}", file=sys.stderr, sep="")
+
+        print("", file=sys.stderr)
+        confirmation = input(f'{colorama.Fore.YELLOW}Type "y" to confirm: ')
+        print("", file=sys.stderr)
+
+        if confirmation != "y":
+            print(
+                colorama.Fore.RED,
+                "Will not proceed without your confirmation.",
+                file=sys.stderr,
+                sep="",
+            )
+            return
 
     dotenver.parse_files(files, override=args.override)
     return
