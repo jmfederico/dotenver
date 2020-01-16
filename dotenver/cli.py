@@ -12,12 +12,10 @@ from . import __version__, dotenver
 
 def check_file_path(file_path):
     """Validate that the given file_path exists and can read."""
-    colorama.init()
-
     dotenv_path = dotenver.get_dotenv_path(file_path)
 
     if basename(dotenv_path) == basename(file_path):
-        print(colorama.Fore.RED, file=sys.stderr)
+        print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError(
             "'%s'. Template file can not be named .env" % file_path
         )
@@ -25,16 +23,16 @@ def check_file_path(file_path):
     try:
         open(file_path, "r")
     except FileNotFoundError:
-        print(colorama.Fore.RED, file=sys.stderr)
+        print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError("'%s' could not be found" % file_path)
     except PermissionError:
-        print(colorama.Fore.RED, file=sys.stderr)
+        print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError("'%s' is not readable" % file_path)
 
     try:
         open(dotenv_path, "a")
     except PermissionError:
-        print(colorama.Fore.RED, file=sys.stderr)
+        print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError("'%s' is not writable" % dotenv_path)
 
     try:
@@ -42,7 +40,7 @@ def check_file_path(file_path):
     except FileNotFoundError:
         pass
     except PermissionError:
-        print(colorama.Fore.RED, file=sys.stderr)
+        print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError("'%s' is not readable" % dotenv_path)
 
     return file_path
@@ -50,6 +48,8 @@ def check_file_path(file_path):
 
 def cli():
     """Parse DotEnver templates and save to .env files."""
+    colorama.init()
+
     parser = argparse.ArgumentParser(
         description="""Render DotEnver templates as .env files.
 By default values in existing in .env files are respected, and missing variables are added.

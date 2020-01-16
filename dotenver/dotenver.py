@@ -149,9 +149,7 @@ def parse_stream(template_stream, current_dotenv):
 """
         )
         for left_side, value in extra_variables.values():
-            template_string = (
-                f"{left_side}={value}" if value is not None else left_side
-            )
+            template_string = f"{left_side}={value}" if value is not None else left_side
             jinja2_template.write(f"{template_string}\n")
 
     template = env.from_string(jinja2_template.getvalue())
@@ -189,9 +187,10 @@ def get_dotenv_dict(dotenv_path):
         pass
     except Exception:
         print(
-            f"{colorama.Fore.RED}\n",
+            colorama.Fore.RED,
             f"The following exception ocurred while reading '{dotenv_path}'",
-            f"\n{colorama.Fore.YELLOW}",
+            colorama.Fore.YELLOW,
+            sep="",
             file=sys.stderr,
         )
         raise
@@ -219,9 +218,11 @@ def parse_files(templates_paths, override=False):
                 )
         except Exception:
             print(
-                f"{colorama.Fore.RED}\n",
-                f"The following exception ocurred while processing template '{template_path}'",
-                f"\n{colorama.Fore.YELLOW}",
+                colorama.Fore.RED,
+                f"The following exception ocurred while processing template"
+                f" '{template_path}'",
+                colorama.Fore.YELLOW,
+                sep="",
                 file=sys.stderr,
             )
             raise
@@ -234,9 +235,11 @@ def parse_files(templates_paths, override=False):
             rendered_templates[template_path] = jinja2_template.render()
         except Exception:
             print(
-                f"{colorama.Fore.RED}\n",
-                f"The following exception ocurred while processing template '{template_path}'",
-                f"\n{colorama.Fore.YELLOW}",
+                colorama.Fore.RED,
+                f"The following exception ocurred while processing template"
+                f" '{template_path}'",
+                colorama.Fore.YELLOW,
+                sep="",
                 file=sys.stderr,
             )
             raise
@@ -248,16 +251,17 @@ def parse_files(templates_paths, override=False):
                 dotenv_file.write(rendered_template)
         except Exception:
             print(
-                f"{colorama.Fore.RED}\n",
+                colorama.Fore.RED,
                 f"The following exception ocurred while writing to '{dotenv_path}'",
-                f"\n{colorama.Fore.YELLOW}",
+                colorama.Fore.YELLOW,
+                sep="",
                 file=sys.stderr,
             )
             raise
 
         print(
-            f"{colorama.Fore.GREEN}",
+            colorama.Fore.GREEN,
             f"'{template_path}' rendered to '{dotenv_path}'",
-            f"{colorama.Fore.RESET}",
+            sep="",
             file=sys.stderr,
         )
