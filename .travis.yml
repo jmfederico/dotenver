@@ -4,5 +4,5 @@ matrix:
     - python: "3.6"
     - python: "3.7"
     - python: "3.8"
-install: pip install tox-travis poetry
+install: pip install tox-travis
 script: tox

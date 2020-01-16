@@ -22,13 +22,15 @@ python = "^3.6"
 jinja2 = "^2.10"
 faker = "^1.0"
 colorama = "^0.4.1"
+pytest = {version = "^5.3.2", optional = true}
+docutils = {version = "^0.16", optional = true}
+pygments = {version = "^2.5.2", optional = true}
+toml = {version = "^0.10.0", optional = true}
+
+[tool.poetry.extras]
+testing = ["pytest", "docutils", "pygments", "toml"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.0"
-docutils = "^0.14.0"
-pygments = "^2.3"
-tox = "^3.7"
-toml = "^0.10.0"
 
 [tool.poetry.scripts]
 dotenver = 'dotenver.cli:cli'
