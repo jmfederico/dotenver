@@ -65,12 +65,15 @@ By default values in existing in .env files are respected, and missing variables
         "-r",
         "--recursive",
         action="store_true",
-        help="process all .env.example files recursively",
+        help="process all template files recursively",
     )
-    group.add_argument(
+    parser.add_argument(
         "--pattern",
-        help="Pattern used to search for template files. Search is recursive using Python glob.",
-        default="**/.env.example"
+        help=(
+            "glob pattern used to search for templates. Only used with --recursive."
+            " Default: '**/.env.example'"
+        ),
+        default="**/.env.example",
     )
     group.add_argument(
         "--version", action="store_true", help="print current DotEnver version"
@@ -98,7 +101,7 @@ By default values in existing in .env files are respected, and missing variables
 
             print(
                 colorama.Fore.RED,
-                'No ".env.example" files found',
+                'No template files found',
                 file=sys.stderr,
                 sep="",
             )
