@@ -68,6 +68,11 @@ By default values in existing in .env files are respected, and missing variables
         help="process all .env.example files recursively",
     )
     group.add_argument(
+        "--pattern",
+        help="Pattern used to search for template files. Search is recursive using Python glob.",
+        default="**/.env.example"
+    )
+    group.add_argument(
         "--version", action="store_true", help="print current DotEnver version"
     )
     group.add_argument(
@@ -87,7 +92,7 @@ By default values in existing in .env files are respected, and missing variables
 
     files = args.files
     if args.recursive:
-        files = glob.glob("**/.env.example", recursive=True)
+        files = glob.glob(args.pattern, recursive=True)
 
         if not files:
 
