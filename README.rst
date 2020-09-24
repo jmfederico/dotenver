@@ -82,7 +82,7 @@ A Docker image `is provided <Dotenver image_>`_. To use it, mount your source co
 
 .. code-block:: console
 
-    $ docker run -ti --rm -v `pwd`:/var/lib/dotenver/ jmfederico/dotenver
+    $ docker run -ti --rm -v "${PWD}:/var/lib/dotenver/" jmfederico/dotenver
 
 .. _Faker: https://faker.readthedocs.io
 .. _Jinja2: http://jinja.pocoo.org
