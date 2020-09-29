@@ -1,6 +1,7 @@
 """Tests for dotenver."""
 
 import tempfile
+from pathlib import Path
 
 import toml
 
@@ -18,7 +19,7 @@ TRUE_VARIABLE= ## dotenver:boolean:named(chance_of_getting_true=100)
 )
 TEMPLATE_FILE.flush()
 
-DOTENV_FILE = open(dotenver.get_dotenv_path(TEMPLATE_FILE.name), "w+")
+DOTENV_FILE = open(dotenver.get_dotenv_path(Path(TEMPLATE_FILE.name)), "w+")
 
 
 def set_dotenv(content):
@@ -45,9 +46,19 @@ def test_version():
     assert project["tool"]["poetry"]["version"] == __version__
 
 
-def test_dotenv_path():
-    """Test that the dotenv file path is generated correctly."""
-    assert dotenver.get_dotenv_path("/path/to/file") == "/path/to/.env"
+def test_dotenv_path_with_example_suffix():
+    """Test that the dotenv file path removes the .example suffix."""
+    assert dotenver.get_dotenv_path(Path("/path/file.example")) == Path("/path/file")
+    assert dotenver.get_dotenv_path(Path("/path/fi.le.example")) == Path("/path/fi.le")
+    assert dotenver.get_dotenv_path(Path("/path/.file.example")) == Path("/path/.file")
+
+
+def test_dotenv_path_without_example_suffix():
+    """Test that the dotenv file returns .env."""
+    assert dotenver.get_dotenv_path(Path("/path/file")) == Path("/path/.env")
+    assert dotenver.get_dotenv_path(Path("/path/file.suffix")) == Path("/path/.env")
+    assert dotenver.get_dotenv_path(Path("/path/.file.suffix")) == Path("/path/.env")
+    assert dotenver.get_dotenv_path(Path("/path/.env.example")) == Path("/path/.env")
 
 
 def test_parse():

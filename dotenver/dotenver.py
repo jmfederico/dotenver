@@ -3,7 +3,7 @@
 import io
 import re
 import sys
-from os.path import dirname
+from pathlib import Path
 
 import colorama
 from faker import Faker
@@ -159,11 +159,10 @@ def parse_stream(template_stream, current_dotenv):
 
 def get_dotenv_path(template_path):
     """Return the .env path for the given template path."""
-    dotenv_dir = dirname(template_path)
-    if dotenv_dir:
-        dotenv_dir += "/"
+    if template_path.suffix == ".example":
+        return template_path.with_suffix("")
 
-    return f"{dotenv_dir}.env"
+    return template_path.with_name(".env")
 
 
 def get_dotenv_dict(dotenv_path):
@@ -207,7 +206,8 @@ def parse_files(templates_paths, override=False):
     # - capture all variables form templates and .env files
     # - capture existing values from .env files
     # - generate Jinja2 template
-    for template_path in templates_paths:
+    for _template_path in templates_paths:
+        template_path = Path(_template_path)
         current_env = (
             get_dotenv_dict(get_dotenv_path(template_path)) if not override else {}
         )
