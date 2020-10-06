@@ -3,7 +3,7 @@
 import argparse
 import glob
 import sys
-from os.path import basename
+from pathlib import Path
 
 import colorama
 
@@ -12,12 +12,13 @@ from . import __version__, dotenver
 
 def check_file_path(file_path):
     """Validate that the given file_path exists and can read."""
+    file_path = Path(file_path)
     dotenv_path = dotenver.get_dotenv_path(file_path)
 
-    if basename(dotenv_path) == basename(file_path):
+    if dotenv_path.name == file_path.name:
         print(colorama.Fore.RED, file=sys.stderr, end="")
         raise argparse.ArgumentTypeError(
-            "'%s'. Template file can not be named .env" % file_path
+            "'%s'. Template file can not be named '%s'" % (file_path, file_path.name)
         )
 
     try:
@@ -101,7 +102,7 @@ By default values in existing in .env files are respected, and missing variables
 
             print(
                 colorama.Fore.RED,
-                'No template files found',
+                "No template files found",
                 file=sys.stderr,
                 sep="",
             )
