@@ -9,7 +9,7 @@ dependencies = [
     "colorama<1.0.0,>=0.4.1",
 ]
 name = "dotenver"
-version = "1.2.2.dev0"
+version = "1.2.2"
 description = "Automatically generate .env files from .env.example template files"
 readme = "README.rst"
 keywords = [
