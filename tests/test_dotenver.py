@@ -43,7 +43,7 @@ def get_tempfile(content):
 def test_version():
     """Test that version is correctly set."""
     project = toml.load("pyproject.toml")
-    assert project["tool"]["poetry"]["version"] == __version__
+    assert project["project"]["version"] == __version__
 
 
 def test_dotenv_path_with_example_suffix():
