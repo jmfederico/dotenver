@@ -5,7 +5,7 @@ Python DotEnver
 .. image:: https://badge.fury.io/py/dotenver.svg
     :target: https://badge.fury.io/py/dotenver
 
-.. image:: https://github.com/jmfederico/dotenver/actions/workflows/tests/badge.svg
+.. image:: https://github.com/jmfederico/dotenver/actions/workflows/tests.yml/badge.svg
     :target: https://github.com/jmfederico/dotenver
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
